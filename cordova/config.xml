@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="org.roketfy.roketfy" version="0.1.0">
+  <name>Roketfy</name>
+  <description>
+    Roketfy App
+  </description>
+  <author email="info@roketfy.com">
+    Roketfy
+  </author>
+  <preference name="EnableDeveloperConsole" value="$IS_DEBUG" />
+</widget>
