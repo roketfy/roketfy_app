@@ -8,4 +8,5 @@
     Roketfy
   </author>
   <preference name="EnableDeveloperConsole" value="$IS_DEBUG" />
+  <preference name="android-targetSdkVersion" value="30" />
 </widget>

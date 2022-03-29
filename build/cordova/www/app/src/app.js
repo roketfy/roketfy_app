@@ -1,4 +1,4 @@
-const {app,Composite,Button, TextView,Font,statusBar,RefreshComposite,Setter,WebView,ScrollView,navigationBar,ImageView,contentView,Stack,Canvas,TextInput,CheckBox,AlertDialog,Tab,TabFolder,Action, NavigationView,ActivityIndicator,Page} = require('tabris');
+const {app,Composite,Button, TextView,Font,statusBar,Switch,RefreshComposite,Setter,WebView,ScrollView,navigationBar,ImageView,contentView,Stack,Canvas,TextInput,CheckBox,AlertDialog,Tab,TabFolder,Action, NavigationView,ActivityIndicator,Page} = require('tabris');
 var tabris_1 = require("tabris");
 const months = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
 
@@ -469,7 +469,7 @@ function createPage(navigationViewTab, title) {
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.send(data);
 
-  }if(title == 'Profil'){
+  }if(title == 'Fiyat Asistanı'){
     const page = new Page({
       title: text,
       background: '#F3F4F9'
@@ -477,13 +477,183 @@ function createPage(navigationViewTab, title) {
     const controls = new Composite({
       centerX: 0, centerY: 0
     }).appendTo(page);
-    new Button({text: 'Logout'})
+    const scrollView_price = new ScrollView({layoutData: 'stretch'}).appendTo(navigationViewTab.pages(0));
+    scrollView_price.append(
+      Composite({
+        top: 20,
+        right: 0,
+        left: 20,
+        children: [
+          TextView({
+            markupEnabled: true,
+            text: '<span font="normal bold 24px sans-serif">Fiyat Asistanı</span>',
+            left: 0,
+            top:0,
+            textColor:'#0A2540',
+          }),
+        ]
+      })
+    );
+    var data = JSON.stringify({
+        "email": email,
+        "password": pass
+    });
+    const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === xhr.DONE) {
+          pricing_arr = JSON.parse(xhr.responseText)['pricing_items'];
+          for(var i=0;i<pricing_arr.length;i++){
+            function pad2(n) {
+              return (n < 10 ? '0' : '') + n;
+            }
+            var product_name=pricing_arr[i]['product_name'];
+            var min_price=pricing_arr[i]['min_price'];
+            var max_price=pricing_arr[i]['max_price'];
+            var step_price=pricing_arr[i]['step_price'];
+            var platform_price=pricing_arr[i]['platform'];
+            var rule_type=pricing_arr[i]['rule_type'];
+            var active=pricing_arr[i]['active'];
+            var pricing_rule_id=pricing_arr[i]['rule_id'];
+            var pricing_logo;
+            if(platform_price == 'trnd'){
+              pricing_logo = 'src/img/ty-logo.png';
+            }else if(platform_price == 'hb'){
+              pricing_logo = 'src/img/hb-logo.png';
+            }
+            if(rule_type == 'buybox'){
+              var rule_type_text = "Buybox'a göre";
+            }else if(rule_type == 'competitor'){
+              var rule_type_text = "Rakibe göre";
+            }
+            if(active=='1'){
+              var switch_check=true;
+            }else{
+              var switch_check=false;
+            }
+            if(active=='1'){
+              var switch_change='0';
+            }else{
+              var switch_change='1';
+            }
+            function price_api(active){
+              if(active==true){
+                var actv='1';
+              }else{
+                var actv='0';
+              }
+              pass = pass.replace("%23", "#");
+              var pricing_data = JSON.stringify({
+                "email": email,
+                "password": pass,
+                "id": pricing_rule_id,
+                "active": actv,
+              });
+
+              var xhr = new XMLHttpRequest();
+              xhr.withCredentials = true;
+              xhr.addEventListener("readystatechange", function() {
+                if(this.readyState === 4) {
+                  console.log(this.responseText);
+                }
+              });
+
+              xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/pricing_assistant_update.php");
+              xhr.setRequestHeader("Content-Type", "application/json");
+              xhr.send(pricing_data);
+            }
+            scrollView_price.append(
+              Composite({
+                right: 20,
+                left: 20,
+                top: 'prev() 20',
+                background:'#ffffff',
+                padding:10,
+                cornerRadius:8,
+                children: [
+                  TextView({
+                    markupEnabled: true,
+                    text: '<span font="normal medium 13px sans-serif">'+rule_type_text+'</span>',
+                    padding:2,
+                    cornerRadius:2,
+                    background: '#FF6000',
+                    textColor:'#ffffff',
+                    alignment:'left',
+                    lineSpacing:1.4,
+                    left:0,
+                  }),
+                  ImageView({
+                    image: {
+                      src: pricing_logo,
+                      height: 18
+                    },
+                    left:'prev() 10',
+                    scaleMode: 'fit',
+                    height: 18,
+                  }),
+                  TextView({
+                    markupEnabled: true,
+                    text: product_name,
+                    right:40,
+                    alignment:'left',
+                    lineSpacing:1.3,
+                    left:0,
+                    top:'prev() 10',
+                  }),
+                  Composite({
+                    top:'prev() 10',
+                    left: 0,
+                    children: [
+                      TextView({
+                        markupEnabled: true,
+                        text: '<span font="normal medium 12px sans-serif">Minimum Fiyat '+min_price+'₺</span>',
+                        alignment:'left',
+                        textColor:'#4D67DF',
+                      }),
+                      TextView({
+                        markupEnabled: true,
+                        text: '<span font="normal medium 12px sans-serif">Maksimum Fiyat '+max_price+'₺</span>',
+                        alignment:'left',
+                        textColor:'#4D67DF',
+                        left:'prev() 10',
+                      }),
+                      TextView({
+                        markupEnabled: true,
+                        text: '<span font="normal medium 12px sans-serif">Değişim Fiyat '+step_price+'₺</span>',
+                        alignment:'left',
+                        textColor:'#4D67DF',
+                        left:0,
+                        top:'prev() 10',
+                      }),
+                    ]
+                  }),
+                  Switch({
+                    right:0,
+                    top:20,
+                    checked:switch_check,
+                  }).onCheckedChanged(event => price_api(event.value)),
+                ]
+              })
+            );
+          }
+        }
+      };
+    xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/pricing_assistant.php");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(data);
+
+    
+    new Button({
+      text: 'Çıkış Yap',
+      top:15,
+      right:20,
+    })
       .onSelect(function () {
         localStorage.clear();
         login = 0;
         localStorage.setItem('login', 0);
         tabris.app.reload();
     }).appendTo(navigationViewTab.pages(0));
+    
   }if(title == 'Bildirimler'){
     const page = new Page({
       title: text,
@@ -512,7 +682,7 @@ function createPage(navigationViewTab, title) {
             left:'prev() 10',
             cornerRadius:10,
             background: '#4D67DF',
-            width:32,
+            width:48,
             height:32,
             alignment: 'centerX',
             textColor:'#fff',
@@ -520,10 +690,29 @@ function createPage(navigationViewTab, title) {
         ]
       })
     );
+
     var data = JSON.stringify({
         "email": email,
         "password": pass
     });
+
+    new Button({
+        right: 0, top: 15,
+        text: '',
+        image: {
+          src: 'src/img/refresh.png',
+          height: 24
+        },
+        background:'#F3F4F9',
+    }).onSelect(function () {
+      tabris.app.reload();
+    }).appendTo(scrollView_noti);
+
+    var data_mark_read = JSON.stringify({
+      "email": email,
+      "password": pass,
+    });
+
     new Button({
         left: 20,right:20, top: 72,
         text: 'TÜMÜNÜ OKUNDU OLARAK İŞARETLE',
@@ -533,82 +722,106 @@ function createPage(navigationViewTab, title) {
         strokeColor: '#4D67DF',
         textColor:'#4D67DF',
     }).onSelect(function () {
-      console.log('najal');
+
+      var xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+
+      xhr.addEventListener("readystatechange", function() {
+        if(this.readyState === 4) {
+          console.log(this.responseText);
+        }
+      });
+
+      xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/notifications_all_read.php");
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.send(data_mark_read);
+      tabris.app.reload();
     }).appendTo(scrollView_noti);
+
+    
 
     const xhr = new XMLHttpRequest();
       xhr.onreadystatechange = () => {
         if (xhr.readyState === xhr.DONE) {
           notifications_arr = JSON.parse(xhr.responseText)['notifications'];
-          for(var i=0;i<notifications_arr.length;i++){
-            function pad2(n) {
-              return (n < 10 ? '0' : '') + n;
+          notifications_count = JSON.parse(xhr.responseText)['item_count'];
+          if(notifications_count!=0){
+            if(notifications_count>50){
+              var nal=50;
+            }else{
+              var nal=notifications_arr.length;
             }
-            var date_time=notifications_arr[i]['date_time'];
-            date_time = date_time.replace(/\s/g, 'T');
-            const d = new Date(date_time);
-            var day = pad2(d.getDate());
-            var month = months[d.getMonth()];
-            var hours = pad2(d.getHours());
-            var minutes = pad2(d.getMinutes());
-            var subject=notifications_arr[i]['subject'];
-            var message=notifications_arr[i]['message'];
-            var platform=notifications_arr[i]['platform'];
-            var status=notifications_arr[i]['status'];
-            var notification_logo;
-            if(platform == 'trnd'){
-              notification_logo = 'src/img/ty-logo.png';
-            }else if(platform == 'hb'){
-              notification_logo = 'src/img/hb-logo.png';
+            for(var i=0;i<notifications_count;i++){
+              function pad2(n) {
+                return (n < 10 ? '0' : '') + n;
+              }
+              var date_time=notifications_arr[i]['date_time'];
+              date_time = date_time.replace(/\s/g, 'T');
+              const d = new Date(date_time);
+              var day = pad2(d.getDate());
+              var month = months[d.getMonth()];
+              var hours = pad2(d.getHours());
+              var minutes = pad2(d.getMinutes());
+              var subject=notifications_arr[i]['subject'];
+              var message=notifications_arr[i]['message'];
+              var platform=notifications_arr[i]['platform'];
+              var status=notifications_arr[i]['status'];
+              var notification_logo;
+              if(platform == 'trnd'){
+                notification_logo = 'src/img/ty-logo.png';
+              }else if(platform == 'hb'){
+                notification_logo = 'src/img/hb-logo.png';
+              }
+              scrollView_noti.append(
+                Composite({
+                  right: 20,
+                  left: 20,
+                  top: 'prev() 20',
+                  background:'#ffffff',
+                  padding:10,
+                  cornerRadius:8,
+                  children: [
+                    TextView({
+                      markupEnabled: true,
+                      text: '<span font="normal bold 13px sans-serif">#'+subject+'</span>',
+                      padding:1,
+                      cornerRadius:4,
+                      background: '#FF6000',
+                      textColor:'#ffffff',
+                      alignment:'left',
+                      lineSpacing:1.4,
+                      left:0,
+                    }),
+                    ImageView({
+                      image: {
+                        src: notification_logo,
+                        height: 18
+                      },
+                      left:'prev() 10',
+                      scaleMode: 'fit',
+                      height: 18,
+                    }),
+                    TextView({
+                      markupEnabled: true,
+                      text: message,
+                      right:0,
+                      alignment:'left',
+                      lineSpacing:1.3,
+                      left:0,
+                      top:'prev() 10',
+                    }),
+                    TextView({
+                      markupEnabled: true,
+                      text: '<span font="normal normal 11px sans-serif">'+day+' '+month+' | '+hours+':'+minutes+'</span>',
+                      alignment:'left',
+                      textColor:'#6A6772',
+                      top:'prev() 10',
+                    }),
+                  ]
+                })
+              );
             }
-            scrollView_noti.append(
-              Composite({
-                right: 20,
-                left: 20,
-                top: 'prev() 20',
-                background:'#ffffff',
-                padding:10,
-                cornerRadius:8,
-                children: [
-                  TextView({
-                    markupEnabled: true,
-                    text: '<span font="normal bold 13px sans-serif">#'+subject+'</span>',
-                    padding:1,
-                    cornerRadius:4,
-                    background: '#FF6000',
-                    textColor:'#ffffff',
-                    alignment:'left',
-                    lineSpacing:1.4,
-                    left:0,
-                  }),
-                  ImageView({
-                    image: {
-                      src: notification_logo,
-                      height: 18
-                    },
-                    left:'prev() 10',
-                    scaleMode: 'fit',
-                    height: 18,
-                  }),
-                  TextView({
-                    markupEnabled: true,
-                    text: message,
-                    right:0,
-                    alignment:'left',
-                    lineSpacing:1.3,
-                    left:0,
-                    top:'prev() 10',
-                  }),
-                  TextView({
-                    markupEnabled: true,
-                    text: '<span font="normal normal 11px sans-serif">'+day+' '+month+' | '+hours+':'+minutes+'</span>',
-                    alignment:'left',
-                    textColor:'#6A6772',
-                    top:'prev() 10',
-                  }),
-                ]
-              })
-            );
           }
         }
       };
@@ -625,7 +838,7 @@ function createPage(navigationViewTab, title) {
 if(login == 1 && typeof page == 'undefined'){
     createTab('Gösterge Paneli', 'src/img/dash.png');
     createTab('Bildirimler', 'src/img/noti.png'); 
-    createTab('Profil', 'src/img/profile.png'); 
+    createTab('Fiyat Asistanı', 'src/img/price.png'); 
 }
 
 if(login == 0 || login == null){
@@ -702,7 +915,7 @@ if(login == 0 || login == null){
                 login_page.dispose();
                 createTab('Gösterge Paneli', 'src/img/dash.png');
                 createTab('Bildirimler', 'src/img/noti.png');
-                createTab('Profil', 'src/img/profile.png'); 
+                createTab('Fiyat Asistanı', 'src/img/price.png'); 
               }
           }
       };
