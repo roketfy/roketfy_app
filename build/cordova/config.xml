@@ -4,5 +4,6 @@
   <description>Roketfy App</description>
   <author email="info@roketfy.com">Roketfy</author>
   <preference name="EnableDeveloperConsole" value="true"/>
+  <preference name="android-targetSdkVersion" value="30" />
   <content src="app/package.json"/>
 </widget>
