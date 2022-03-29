@@ -708,6 +708,11 @@ function createPage(navigationViewTab, title) {
       tabris.app.reload();
     }).appendTo(scrollView_noti);
 
+    var data_mark_read = JSON.stringify({
+      "email": email,
+      "password": pass,
+    });
+
     new Button({
         left: 20,right:20, top: 72,
         text: 'TÜMÜNÜ OKUNDU OLARAK İŞARETLE',
@@ -717,7 +722,21 @@ function createPage(navigationViewTab, title) {
         strokeColor: '#4D67DF',
         textColor:'#4D67DF',
     }).onSelect(function () {
-      console.log('najal');
+
+      var xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+
+      xhr.addEventListener("readystatechange", function() {
+        if(this.readyState === 4) {
+          console.log(this.responseText);
+        }
+      });
+
+      xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/notifications_all_read.php");
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.send(data_mark_read);
+      tabris.app.reload();
     }).appendTo(scrollView_noti);
 
     
