@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "961265180417",
+    "project_id": "roketfy",
+    "storage_bucket": "roketfy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961265180417:android:c0cc136cea1842deb3c500",
+        "android_client_info": {
+          "package_name": "org.roketfy.roketfy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "961265180417-3ifbg39mnjmcpk4ucpdcqrtbfrkbrdo7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJe4bansr1wTn1kMnfX7wiVSn6vYSlHcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "961265180417-3ifbg39mnjmcpk4ucpdcqrtbfrkbrdo7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
