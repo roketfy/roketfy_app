@@ -1,13 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="org.roketfy.roketfy" version="1.1.0">
+<widget id="org.roketfy.roketfy" version="1.2">
   <name>Roketfy</name>
   <description>
     Pazaryeri satışlarınızı artırmanın en etkili ve en kolay yolu!
   </description>
   <author email="destek@roketfy.com" href="https://roketfy.com">
     Roketfy
-  </author>
-  <preference name="EnableDeveloperConsole" value="false" />
+  </author> 
   <preference name="android-targetSdkVersion" value="30" />
   <plugin name="tabris-plugin-firebase" spec="https://github.com/eclipsesource/tabris-plugin-firebase.git" />
   <platform name="ios">
