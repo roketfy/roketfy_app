@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "cordova-android": "file:../../../.tabris-cli/platforms/android/3.8.0",
-    "cordova-ios": "file:../../../.tabris-cli/platforms/ios/3.8.0"
-  }
-}

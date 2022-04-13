@@ -24,6 +24,7 @@ const tabFolder = new TabFolder({
 }).appendTo(tabris_1.contentView);
 
 function createTab(title, image) {
+    notifications = 0;
     email = localStorage.getItem('email');
     pass = localStorage.getItem('pass');
     var data = JSON.stringify({
@@ -501,138 +502,154 @@ function createPage(navigationViewTab, title) {
     const xhr = new XMLHttpRequest();
       xhr.onreadystatechange = () => {
         if (xhr.readyState === xhr.DONE) {
-          pricing_arr = JSON.parse(xhr.responseText)['pricing_items'];
-          for(var i=0;i<pricing_arr.length;i++){
-            function pad2(n) {
-              return (n < 10 ? '0' : '') + n;
-            }
-            var product_name=pricing_arr[i]['product_name'];
-            var min_price=pricing_arr[i]['min_price'];
-            var max_price=pricing_arr[i]['max_price'];
-            var step_price=pricing_arr[i]['step_price'];
-            var platform_price=pricing_arr[i]['platform'];
-            var rule_type=pricing_arr[i]['rule_type'];
-            var active=pricing_arr[i]['active'];
-            var pricing_rule_id=pricing_arr[i]['rule_id'];
-            var pricing_logo;
-            if(platform_price == 'trnd'){
-              pricing_logo = 'src/img/ty-logo.png';
-            }else if(platform_price == 'hb'){
-              pricing_logo = 'src/img/hb-logo.png';
-            }
-            if(rule_type == 'buybox'){
-              var rule_type_text = "Buybox'a göre";
-            }else if(rule_type == 'competitor'){
-              var rule_type_text = "Rakibe göre";
-            }
-            if(active=='1'){
-              var switch_check=true;
-            }else{
-              var switch_check=false;
-            }
-            if(active=='1'){
-              var switch_change='0';
-            }else{
-              var switch_change='1';
-            }
-            function price_api(active){
-              if(active==true){
-                var actv='1';
-              }else{
-                var actv='0';
+          pricing_count = JSON.parse(xhr.responseText)['item_count'];
+          if(pricing_count>0){
+            pricing_arr = JSON.parse(xhr.responseText)['pricing_items'];
+            for(var i=0;i<pricing_arr.length;i++){
+              function pad2(n) {
+                return (n < 10 ? '0' : '') + n;
               }
-              pass = pass.replace("%23", "#");
-              var pricing_data = JSON.stringify({
-                "email": email,
-                "password": pass,
-                "id": pricing_rule_id,
-                "active": actv,
-              });
-
-              var xhr = new XMLHttpRequest();
-              xhr.withCredentials = true;
-              xhr.addEventListener("readystatechange", function() {
-                if(this.readyState === 4) {
-                  console.log(this.responseText);
+              var product_name=pricing_arr[i]['product_name'];
+              var min_price=pricing_arr[i]['min_price'];
+              var max_price=pricing_arr[i]['max_price'];
+              var step_price=pricing_arr[i]['step_price'];
+              var platform_price=pricing_arr[i]['platform'];
+              var rule_type=pricing_arr[i]['rule_type'];
+              var active=pricing_arr[i]['active'];
+              var pricing_rule_id=pricing_arr[i]['rule_id'];
+              var pricing_logo;
+              if(platform_price == 'trnd'){
+                pricing_logo = 'src/img/ty-logo.png';
+              }else if(platform_price == 'hb'){
+                pricing_logo = 'src/img/hb-logo.png';
+              }
+              if(rule_type == 'buybox'){
+                var rule_type_text = "Buybox'a göre";
+              }else if(rule_type == 'competitor'){
+                var rule_type_text = "Rakibe göre";
+              }
+              if(active=='1'){
+                var switch_check=true;
+              }else{
+                var switch_check=false;
+              }
+              if(active=='1'){
+                var switch_change='0';
+              }else{
+                var switch_change='1';
+              }
+              function price_api(active){
+                if(active==true){
+                  var actv='1';
+                }else{
+                  var actv='0';
                 }
-              });
+                pass = pass.replace("%23", "#");
+                var pricing_data = JSON.stringify({
+                  "email": email,
+                  "password": pass,
+                  "id": pricing_rule_id,
+                  "active": actv,
+                });
 
-              xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/pricing_assistant_update.php");
-              xhr.setRequestHeader("Content-Type", "application/json");
-              xhr.send(pricing_data);
+                var xhr = new XMLHttpRequest();
+                xhr.withCredentials = true;
+                xhr.addEventListener("readystatechange", function() {
+                  if(this.readyState === 4) {
+                    console.log(this.responseText);
+                  }
+                });
+
+                xhr.open("POST", "https://api.roketfy.com/rapi/dashboard/pricing_assistant_update.php");
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(pricing_data);
+              }
+              scrollView_price.append(
+                Composite({
+                  right: 20,
+                  left: 20,
+                  top: 'prev() 20',
+                  background:'#ffffff',
+                  padding:10,
+                  cornerRadius:8,
+                  children: [
+                    TextView({
+                      markupEnabled: true,
+                      text: '<span font="normal medium 13px sans-serif">'+rule_type_text+'</span>',
+                      padding:2,
+                      cornerRadius:2,
+                      background: '#FF6000',
+                      textColor:'#ffffff',
+                      alignment:'left',
+                      lineSpacing:1.4,
+                      left:0,
+                    }),
+                    ImageView({
+                      image: {
+                        src: pricing_logo,
+                        height: 18
+                      },
+                      left:'prev() 10',
+                      scaleMode: 'fit',
+                      height: 18,
+                    }),
+                    TextView({
+                      markupEnabled: true,
+                      text: product_name,
+                      right:40,
+                      alignment:'left',
+                      lineSpacing:1.3,
+                      left:0,
+                      top:'prev() 10',
+                    }),
+                    Composite({
+                      top:'prev() 10',
+                      left: 0,
+                      children: [
+                        TextView({
+                          markupEnabled: true,
+                          text: '<span font="normal medium 12px sans-serif">Minimum Fiyat '+min_price+'₺</span>',
+                          alignment:'left',
+                          textColor:'#4D67DF',
+                        }),
+                        TextView({
+                          markupEnabled: true,
+                          text: '<span font="normal medium 12px sans-serif">Maksimum Fiyat '+max_price+'₺</span>',
+                          alignment:'left',
+                          textColor:'#4D67DF',
+                          left:'prev() 10',
+                        }),
+                        TextView({
+                          markupEnabled: true,
+                          text: '<span font="normal medium 12px sans-serif">Değişim Fiyat '+step_price+'₺</span>',
+                          alignment:'left',
+                          textColor:'#4D67DF',
+                          left:0,
+                          top:'prev() 10',
+                        }),
+                      ]
+                    }),
+                    Switch({
+                      right:0,
+                      top:20,
+                      checked:switch_check,
+                    }).onCheckedChanged(event => price_api(event.value)),
+                  ]
+                })
+              );
             }
+          }else{
             scrollView_price.append(
-              Composite({
-                right: 20,
-                left: 20,
-                top: 'prev() 20',
-                background:'#ffffff',
-                padding:10,
-                cornerRadius:8,
-                children: [
-                  TextView({
-                    markupEnabled: true,
-                    text: '<span font="normal medium 13px sans-serif">'+rule_type_text+'</span>',
-                    padding:2,
-                    cornerRadius:2,
-                    background: '#FF6000',
-                    textColor:'#ffffff',
-                    alignment:'left',
-                    lineSpacing:1.4,
-                    left:0,
-                  }),
-                  ImageView({
-                    image: {
-                      src: pricing_logo,
-                      height: 18
-                    },
-                    left:'prev() 10',
-                    scaleMode: 'fit',
-                    height: 18,
-                  }),
-                  TextView({
-                    markupEnabled: true,
-                    text: product_name,
-                    right:40,
-                    alignment:'left',
-                    lineSpacing:1.3,
-                    left:0,
-                    top:'prev() 10',
-                  }),
-                  Composite({
-                    top:'prev() 10',
-                    left: 0,
-                    children: [
-                      TextView({
-                        markupEnabled: true,
-                        text: '<span font="normal medium 12px sans-serif">Minimum Fiyat '+min_price+'₺</span>',
-                        alignment:'left',
-                        textColor:'#4D67DF',
-                      }),
-                      TextView({
-                        markupEnabled: true,
-                        text: '<span font="normal medium 12px sans-serif">Maksimum Fiyat '+max_price+'₺</span>',
-                        alignment:'left',
-                        textColor:'#4D67DF',
-                        left:'prev() 10',
-                      }),
-                      TextView({
-                        markupEnabled: true,
-                        text: '<span font="normal medium 12px sans-serif">Değişim Fiyat '+step_price+'₺</span>',
-                        alignment:'left',
-                        textColor:'#4D67DF',
-                        left:0,
-                        top:'prev() 10',
-                      }),
-                    ]
-                  }),
-                  Switch({
-                    right:0,
-                    top:20,
-                    checked:switch_check,
-                  }).onCheckedChanged(event => price_api(event.value)),
-                ]
-              })
+              TextView({
+                  markupEnabled: true,
+                  text: 'Henüz hiçbir ürün için fiyat kuralı oluşturmadınız.',
+                  textColor:'#000000',
+                  alignment:'left',
+                  lineSpacing:1.4,
+                  left:20,
+                  right:20,
+                  top:80,
+                })
             );
           }
         }
@@ -863,7 +880,7 @@ if(login == 0 || login == null){
     left: 40, right: 40,top:150,
     height:44,
     padding: {left: 10, right: 10, top: 0, bottom: 0},
-    message: 'Email',
+    message: 'E-Posta',
     keyboard: 'email',
     focused: true,
   }).onTextChanged(event => {email= event.value}).appendTo(login_page.pages(0));
@@ -872,13 +889,13 @@ if(login == 0 || login == null){
     left: 40, right: 40, top: 'prev() 10',
     height:44,
     padding: {left: 10, right: 10, top: 0, bottom: 0},
-    message: 'Password',
+    message: 'Parola',
     type: 'password',
   }).onTextChanged(event => {pass= event.value}).appendTo(login_page.pages(0));
 
   new CheckBox({
     left: 40, right: 40, top: 'prev() 10',
-    text: 'Show password'
+    text: 'Şifreyi Göster'
   }).onCheckedChanged(event => pass_input.revealPassword = event.value)
     .appendTo(login_page.pages(0));
 
@@ -924,7 +941,7 @@ if(login == 0 || login == null){
       xhr.send(data);
     }else{
       new AlertDialog({
-        title: 'HATA',
+        title: 'Hata',
         buttons: {ok: 'OK'}
       }).open();
       activityIndicator.visible = false;
